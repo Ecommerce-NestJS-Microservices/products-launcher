@@ -3,3 +3,6 @@
 	#url = https://github.com/Nest-Microservices-Mozadev/client-gateway.git
 	url = git@github.com:Nest-Microservices-Mozadev/client-gateway.git
 
+[submodule "products-ms"]
+	path = products-ms
+	url = git@github.com:Nest-Microservices-Mozadev/orders-microservice.git
