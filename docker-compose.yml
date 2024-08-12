@@ -21,6 +21,19 @@ services:
       - PORT=3000
       - NATS_SERVERS=nats://nats-server:4222
 
+
+ 
+
+  auth-ms:
+    build: ./auth-ms
+    volumes:
+      - ./auth-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3006
+      - NATS_SERVERS=nats://nats-server:4222
+
+
   products-ms:
     build: ./products-ms
     volumes:
@@ -79,3 +92,4 @@ services:
       - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
       - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
       - STRIPE_ENDPOINT_SECRET=${STRIPE_ENDPOINT_SECRET}
+
