@@ -22,8 +22,6 @@ services:
       - NATS_SERVERS=nats://nats-server:4222
 
 
- 
-
   auth-ms:
     build: ./auth-ms
     volumes:
