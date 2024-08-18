@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  nats-server:
+    # image previously builded
+    image: nats:latest
+  #   ports:  not necesary only to prove ports in host to monitor, when we stay inside the  red, it doens't necesary
+  #     - "4222:4222"
+  #     - "8222:8222"
+  #     - "6222:6222"
+
+  client-gateway:
+    # image that  will be constructed in that time
+    #build: ./client-gateway #this point dockerfile inside client-gateway
+    build:
+      context: ./client-gateway
+      dockerfile: dockerfile.prod
+    image: client-gateway-prod
+    # It is not necessary for the construction, only for the execution
+    ports:
+      - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
+    # It is not necessary since We have only defined to link our src with container's src to pass changes in develpment software. In production it is not neccesary
+    # volumes:
+    #   - ./client-gateway/src:/usr/src/app/src
+    #command: npm run start:dev    this command is already specify in dockerfile.prod, if it weren't specified there, then it would be necessary here.
+    # the environmnet variables are not neccesary for its construction either.
+    environment:
+      - PORT=${CLIENT_GATEWAY_PORT}
+      - NATS_SERVERS=nats://nats-server:4222
+
+  auth-ms:
+    build:
+      context: ./auth-ms
+      dockerfile: dockerfile.prod
+    # Tags can be created via console
+    image: auth-ms-prod #We won't need the volumes either
+    # volumes:
+    #   - ./auth-ms/src:/usr/src/app/src
+    #We don't need because we stay in prod
+    # command: npm run start:dev
+    # The port is irrelevant because it will create a version itself
+    # We will leave the database there because later We won't need to specify it.
+    # These variables are for running the app, not for building.
+    environment:
+      - PORT=3006
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=${AUTH_DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+
+  products-ms:
+    build:
+      context: ./products-ms
+      dockerfile: dockerfile.prod
+    image: products-ms-prod
+    # volumes:
+    #   - ./products-ms/src:/usr/src/app/src
+    # command: npm run start:dev
+    environment:
+      - PORT=3001
+      - NATS_SERVERS=nats://nats-server:4222
+      #we can leave databa... because is a localfile, only for try is right, Actually we shoudl use other like postgres
+      - DATABASE_URL=file:./dev.db
+    # # Order MS
+
+  orders-ms:
+    # Now It not depends of anyone
+    # depends_on:
+    #   - orders-db
+    build:
+      context: ./orders-ms
+      dockerfile: dockerfile.prod
+      # Argument of constructions
+      args:
+        - ORDERS_DATABASE_URL=${ORDERS_DATABASE_URL}
+    image: orders-ms-prod
+    # volumes:
+    #   - ./orders-ms/src:/usr/src/app/src
+    # command: npm run start:dev
+    environment:
+      - PORT=3002
+      - DATABASE_URL=${ORDERS_DATABASE_URL}
+      - NATS_SERVERS=nats://nats-server:4222
+      #- DATABASE_URL=postgresql://postgres:123456@localhost:5435/ordersdb?schema=public  in this machine virtual does not exist database in localhost,when work without docker this code work
+      #- DATABASE_URL=postgresql://postgres:123456@orders-db:5432/ordersdb?schema=public # in your place should be orders-db wich is the dns of container o service of database
+
+
+
+
+
+    # We can remove the OrderDB since we will handle it separately in production.
+    # # Orders DB
+    # orders-db:
+    #   container_name: orders_database
+    #   image: postgres:16.2
+    #   restart: always
+    #   volumes:
+    #     - ./orders-ms/postgres:/var/lib/postgresql/data
+    #   ports:
+    #     - 5435:5432
+    #   environment:
+    #     - POSTGRES_USER=postgres
+    #     - POSTGRES_PASSWORD=123456
+    #     - POSTGRES_DB=ordersdb
+
+
+
+
+    # -------------------------
+    # Payments Microservice
+    # -------------------------
+
+
+  payments-ms:
+    # container_name: payments-ms
+    # build: ./payments-ms
+    build:
+      context: ./payments-ms
+      dockerfile: dockerfile.prod
+    image: payments-ms-prod
+    # volumes:
+    #   - ./payments-ms/src:/usr/src/app/src
+    # command: npm run start:dev
+    # This is a hybrid app listening to both NATS and HTTP, We can leave it as is  since we have got PAYMENTS_MS_POR defined in .env. It's not necessary to use the real variable because I already tested. 
+    ports:
+      - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
+    environment:
+      - PORT=${PAYMENTS_MS_PORT}
+      - NATS_SERVERS=nats://nats-server:4222
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
+      - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
+      - STRIPE_ENDPOINT_SECRET=${STRIPE_ENDPOINT_SECRET}

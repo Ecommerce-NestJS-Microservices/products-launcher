@@ -36,7 +36,15 @@ If you work in the repository that contains the  sub-modules, **first update and
 
 I you do it the other way around, you will lose the submodules  references int the main repository and will have to resolve conflicts.
 
+# Prod
 
+1. Clone the repository
+2. Create .env based in .env.template
+3. Execute the command
+
+```
+docker compose -f docker-compose.prod.yml build
+```
 
 
 
