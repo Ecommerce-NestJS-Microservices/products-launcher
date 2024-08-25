@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products-ms
+  template:
+    metadata:
+      labels:
+        app: products-ms
+    spec:
+      containers:
+      - name: products-ms
+        image: northamerica-northeast1-docker.pkg.dev/microservices-dev-432918/image-registry/products-ms
+        env:
+        - name: PORT
+          value: "3001"
+        - name: NATS_SERVERS
+          value: "nats://nats"
+        - name: DATABASE_URL
+          value: "file:./dev.db"
