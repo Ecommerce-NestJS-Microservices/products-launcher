@@ -3,32 +3,37 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: orders-ms
-  name: orders-ms
+    app: auth-ms
+  name: auth-ms
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: orders-ms
+      app: auth-ms
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: orders-ms
+        app: auth-ms
     spec:
       containers:
-      - image: northamerica-northeast1-docker.pkg.dev/microservices-dev-432918/image-registry/orders-ms
-        name: orders-ms
+      - image: northamerica-northeast1-docker.pkg.dev/microservices-dev-432918/image-registry/auth-ms
+        name: auth-ms
         env:
         - name: PORT
-          value: "3002"
+          value: "3006"
         - name: NATS_SERVERS
-          value: "nats://nats"
+          value: "nats/nats"
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: orders-secrets 
+              name: auth-secrets
               key: database_url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth-secrets
+              key: jwt_secret
         resources: {}
 status: {}
