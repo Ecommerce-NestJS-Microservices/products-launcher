@@ -3,16 +3,16 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: nats
-  name: nats
+    app: auth-ms
+  name: auth-ms
 spec:
   ports:
-  - name: "4222"
-    port: 4222
+  - name: "3006"
+    port: 3006
     protocol: TCP
-    targetPort: 4222
+    targetPort: 3006
   selector:
-    app: nats
-    type: ClusterIP
+    app: auth-ms    
+  type: ClusterIP
 status:
   loadBalancer: {}
