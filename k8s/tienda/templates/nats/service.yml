@@ -13,6 +13,6 @@ spec:
     targetPort: 4222
   selector:
     app: nats
-    type: ClusterIP
+    #type: ClusterIP
 status:
   loadBalancer: {}
