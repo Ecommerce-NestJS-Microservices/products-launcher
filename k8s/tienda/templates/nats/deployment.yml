@@ -20,11 +20,5 @@ spec:
       containers:
       - image: nats
         name: nats
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
+        resources: {}
 status: {}
